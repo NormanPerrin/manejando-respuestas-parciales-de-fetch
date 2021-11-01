@@ -1,0 +1,39 @@
+<form onsubmit="enviarComando(event)">
+    <input type="text"></input>
+</form>
+
+<pre class="output"></pre>
+
+<script>
+    const outputHtml = document.querySelector('.output');
+
+    async function enviarComando(e) {
+        e.preventDefault();
+
+        const input = e.target.children[0],
+            comando = input.value;
+
+        input.textContent = '';
+        outputHtml.textContent = '';
+
+        const respuesta = await fetch('/', {
+            method: 'POST',
+            body: comando
+        });
+
+        const lector = respuesta.body.getReader();
+
+        let fin = false;
+
+        while (!fin) {
+            const lectura = await lector.read();
+
+            fin = lectura.done;
+
+            const valor = new TextDecoder('utf-8')
+                .decode(lectura.value);
+
+            outputHtml.textContent += valor;
+        }
+    }
+</script>
